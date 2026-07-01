@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  
+  <!-- PWA & Apple Safari Standalone Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="HabitTracker">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  
+  <title>Training Habit Tracker</title>
+  
+  <!-- Web App Manifest -->
+  <link rel="manifest" href="manifest.json">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- アプリヘッダー -->
+  <header>
+    <div class="header-title">
+      <h1>Habit Tracker</h1>
+      <p id="header-date-text">---</p>
+    </div>
+    <div class="week-badge" id="header-week-badge">Week 1</div>
+  </header>
+
+  <!-- メインコンテンツ領域 -->
+  <main id="main-content">
+
+    <!-- 1. 今日画面 -->
+    <div id="screen-today" class="screen active">
+      <!-- 継続日数と週次進捗 -->
+      <div class="card" style="margin-bottom: 16px; background: linear-gradient(135deg, rgba(20, 22, 31, 0.8), rgba(27, 30, 43, 0.8));">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <span style="font-size:12px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.5px;">Habit Streak</span>
+          <span class="badge-tag" style="background-color:rgba(16, 185, 129, 0.1); color:#34d399; border-color:rgba(16, 185, 129, 0.2)">継続支援</span>
+        </div>
+        <div style="display:flex; align-items:baseline; gap:8px; margin-bottom:14px;">
+          <span id="streak-count-text" style="font-family:'Outfit', sans-serif; font-size:28px; font-weight:800; color:#34d399;">0 日連続</span>
+          <span style="font-size:12px; color:var(--text-secondary);">継続中！</span>
+        </div>
+        <div class="progress-container">
+          <div class="progress-header">
+            <span>今週の目標進捗</span>
+            <span id="weekly-progress-text">今週 0 / 4 回</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="weekly-progress-bar-fill"></div>
+          </div>
+          <div class="weekly-schedule-dots" id="weekly-schedule-dots">
+            <!-- JSで動的に曜日ドットを生成 -->
+          </div>
+        </div>
+      </div>
+
+      <!-- 今日やるトレーニング表示コンテナ -->
+      <div id="today-workout-container">
+        <!-- JSで動的レンダリング -->
+        <div style="text-align:center; padding:40px; color:var(--text-tertiary);">読み込み中...</div>
+      </div>
+    </div>
+
+    <!-- 2. メニュー一覧画面 -->
+    <div id="screen-menus" class="screen">
+      <div class="card" style="padding:14px; margin-bottom:16px;">
+        <p style="font-size:12px; color:var(--text-secondary); line-height:1.4;">
+          設定済みのプログラム一覧です。タップするとトレーニング内容や初心者向けのやり方、狙う筋肉などを確認できます。
+        </p>
+      </div>
+      <div id="menu-list-container">
+        <!-- JSで全メニューをレンダリング -->
+      </div>
+    </div>
+
+    <!-- 3. 履歴画面 -->
+    <div id="screen-history" class="screen">
+      <!-- 集計統計 -->
+      <div class="stats-summary-grid">
+        <div class="stats-box">
+          <div class="stats-box-value" id="history-weekly-count">0 回</div>
+          <div class="stats-box-label">今週の実施</div>
+        </div>
+        <div class="stats-box">
+          <div class="stats-box-value" id="history-streak-count" style="color:#34d399;">0 日</div>
+          <div class="stats-box-label">現在の継続</div>
+        </div>
+        <div class="stats-box">
+          <div class="stats-box-value" id="history-monthly-count" style="color:#60a5fa;">0 回</div>
+          <div class="stats-box-label">今月の実施</div>
+        </div>
+      </div>
+
+      <!-- 履歴フィルター -->
+      <div class="filter-row" id="history-filter-row">
+        <!-- JSでフィルターボタンをレンダリング -->
+      </div>
+
+      <!-- 履歴ログ一覧 -->
+      <div id="history-logs-container">
+        <!-- JSで履歴リストをレンダリング -->
+      </div>
+    </div>
+
+    <!-- 4. 設定画面 -->
+    <div id="screen-settings" class="screen">
+      
+      <!-- 設定項目セクション -->
+      <h3 class="settings-section-title">プログラム設定</h3>
+      <div class="settings-list">
+        <div class="settings-item">
+          <div class="settings-info">
+            <span class="settings-label">トレーニング開始日</span>
+            <span class="settings-sublabel">経過週の計算基準日です。</span>
+          </div>
+          <div class="settings-control">
+            <input type="date" id="settings-start-date" class="form-input" style="padding:6px; font-size:13px; width:auto; border-radius:8px;">
+          </div>
+        </div>
+        <div class="settings-item">
+          <div class="settings-info">
+            <span class="settings-label">現在の進行週 (1〜8)</span>
+            <span class="settings-sublabel">進行度を手動で上書き変更します。</span>
+          </div>
+          <div class="settings-control">
+            <select id="settings-week-idx-override" class="form-select" style="padding:6px; font-size:13px; width:80px; border-radius:8px;">
+              <option value="1">1週目</option>
+              <option value="2">2週目</option>
+              <option value="3">3週目</option>
+              <option value="4">4週目</option>
+              <option value="5">5週目</option>
+              <option value="6">6週目</option>
+              <option value="7">7週目</option>
+              <option value="8">8週目</option>
+            </select>
+          </div>
+        </div>
+        <div class="settings-item">
+          <div class="settings-info">
+            <span class="settings-label">週末メニューの既定値</span>
+            <span class="settings-sublabel">土日に標準で表示するメニュー。</span>
+          </div>
+          <div class="settings-control">
+            <select id="settings-weekend-menu" class="form-select" style="padding:6px; font-size:13px; width:120px; border-radius:8px;">
+              <option value="hiit">HIIT (自宅)</option>
+              <option value="briskwalk">速歩き (20分)</option>
+            </select>
+          </div>
+        </div>
+        <div class="settings-item">
+          <div class="settings-info">
+            <span class="settings-label">タイマーに準備運動を含める</span>
+            <span class="settings-sublabel">開始時に3分の準備体操を行います。</span>
+          </div>
+          <div class="settings-control">
+            <label class="switch">
+              <input type="checkbox" id="settings-warmup-enabled" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+      
+      <button class="btn btn-primary" id="settings-save-btn" style="margin-bottom: 24px;">設定を保存する</button>
+
+      <!-- 8週間ガイドライン -->
+      <h3 class="settings-section-title">8週間進行ガイド</h3>
+      <div class="guide-list" id="settings-guide-container" style="margin-bottom: 24px;">
+        <!-- JSでガイドラインをレンダリング -->
+      </div>
+
+
+      <!-- 通知設定 -->
+      <h3 class="settings-section-title">🔔 トレーニング通知</h3>
+      <div class="card" style="margin-bottom: 24px; padding: 16px;">
+
+        <!-- 現在の状態 -->
+        <p id="notification-status-text" style="font-size:13px; margin-bottom:14px; line-height:1.6;">
+          読み込み中...
+        </p>
+
+        <!-- 通知時刻設定 -->
+        <div class="settings-item" style="margin-bottom:14px; border:none; padding:0;">
+          <div class="settings-info">
+            <span class="settings-label">通知時刻</span>
+            <span class="settings-sublabel">トレーニング日のこの時刻にお知らせ</span>
+          </div>
+          <div class="settings-control">
+            <input type="time" id="settings-notification-time" class="form-input"
+              style="padding:6px; font-size:13px; width:auto; border-radius:8px;" value="18:00">
+          </div>
+        </div>
+
+        <!-- 有効化/無効化ボタン -->
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn btn-primary" id="notification-enable-btn"
+            style="font-size:13px; padding:10px 16px;">
+            🔔 通知を有効にする
+          </button>
+          <button class="btn btn-secondary" id="notification-disable-btn"
+            style="font-size:13px; padding:10px 16px; display:none;">
+            🔕 通知を無効にする
+          </button>
+        </div>
+
+        <!-- iPhone向け補足 -->
+        <p style="font-size:11px; color:var(--text-secondary); margin-top:12px; line-height:1.6;">
+          ⚠️ <strong>iPhoneご利用の方へ：</strong><br>
+          Safariでのプッシュ通知はiOS 16.4以上でホーム画面に追加したPWAのみ対応しています。<br>
+          通知はアプリを開いたタイミングで確認されます。<br>
+          通知が届かない場合：設定 → Safari → 詳細 → Webサイトデータ を確認してください。
+        </p>
+      </div>
+
+      <!-- データ管理（JSON） -->
+      <h3 class="settings-section-title">データ管理・バックアップ</h3>
+      <div class="card" style="margin-bottom: 24px;">
+        <p style="font-size:12px; color:var(--text-secondary); margin-bottom:12px;">
+          localStorageのデータをJSONで書き出し/読み込みします。機種変更時やデータ保管にご利用ください。
+        </p>
+        <textarea id="settings-backup-area" class="form-textarea" placeholder="ここにバックアップJSONを入力/出力します" style="margin-bottom: 12px; font-size:11px; font-family:monospace;"></textarea>
+        <div class="btn-group-row">
+          <button class="btn btn-secondary btn-sm" id="settings-export-btn">JSON書き出し</button>
+          <button class="btn btn-secondary btn-sm" id="settings-import-btn">インポート</button>
+        </div>
+        <button class="btn btn-danger btn-sm" id="settings-reset-btn" style="margin-top: 14px; background:none; border:1px solid rgba(239,68,68,0.4); color:#f87171;">アプリデータの初期化...</button>
+      </div>
+
+      <!-- ホーム画面追加手順 -->
+      <h3 class="settings-section-title">ホーム画面への追加方法</h3>
+      <div class="help-box" style="margin-bottom: 24px;">
+        <ol>
+          <li>Safariでこのページを開きます。</li>
+          <li>画面下の共有アイコン（上向き矢印）をタップします。</li>
+          <li>メニュー内の<strong>「ホーム画面に追加」</strong>をタップします。</li>
+          <li>ホーム画面上のアイコンから起動すると、全画面表示で使用できます。</li>
+        </ol>
+      </div>
+    </div>
+  </main>
+
+  <!-- メニュー詳細全画面オーバーレイ -->
+  <div id="detail-view" class="detail-view-container">
+    <div id="detail-view-content"></div>
+  </div>
+
+  <!-- 手動記録ポップアップモーダル -->
+  <div id="record-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-title">トレーニング記録</h3>
+        <button class="modal-close-btn" id="modal-close-btn">&times;</button>
+      </div>
+      <form id="record-form">
+        <input type="hidden" id="record-menu-id">
+        <input type="hidden" id="record-status-hidden" value="completed">
+
+        <div class="form-group">
+          <label class="form-label">日付</label>
+          <input type="date" id="record-date" class="form-input" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">実施ステータス</label>
+          <div class="status-pill-group">
+            <div class="status-pill active" data-status="completed">完了</div>
+            <div class="status-pill" data-status="partial">一部実施</div>
+            <div class="status-pill" data-status="minimal">最低限</div>
+            <div class="status-pill" data-status="skipped">スキップ</div>
+          </div>
+        </div>
+
+        <div class="btn-group-row">
+          <div class="form-group">
+            <label class="form-label">実施周回数</label>
+            <input type="number" id="record-rounds" class="form-input" min="0" max="10">
+          </div>
+          <div class="form-group">
+            <label class="form-label">所要時間 (分)</label>
+            <input type="number" id="record-duration" class="form-input" min="0" max="120">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">メモ / 体調など</label>
+          <textarea id="record-note" class="form-textarea" placeholder="（任意）回数変更やメモを記入してください"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="margin-top: 10px; --workout-color: var(--rgb-workout-a)">記録を保存する</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ワークアウト実行タイマー画面 -->
+  <div id="runner-view" class="runner-view-container">
+    <!-- ヘッダー -->
+    <div class="runner-header">
+      <span class="runner-progress-text" id="runner-progress-text">ステップ 1 / 10</span>
+      <h4 class="runner-title" id="runner-workout-title">筋トレA</h4>
+      
+      <!-- サウンドON/OFFボタン -->
+      <button class="runner-sound-btn" id="runner-sound-toggle">
+        <svg id="sound-on-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:22px; height:22px;">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+        </svg>
+        <svg id="sound-off-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:22px; height:22px; display:none;">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <line x1="23" y1="9" x2="17" y2="15"></line>
+          <line x1="17" y1="9" x2="23" y2="15"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- メインパネル -->
+    <div class="runner-main-panel">
+      <div class="runner-step-type exercise" id="runner-step-type">本編</div>
+      <h3 class="runner-exercise-name" id="runner-exercise-name">スクワット</h3>
+      
+      <!-- カウントダウン数字 -->
+      <div class="runner-timer-display" id="runner-timer-display">00:30</div>
+      
+      <!-- 回数案内（時間のない種目の場合） -->
+      <div class="runner-qty-display" id="runner-qty-display" style="display:none;">15回</div>
+      
+      <div class="runner-tip">
+        <p id="runner-tip-text">フォームを崩さないように行いましょう。</p>
+      </div>
+    </div>
+
+    <!-- 次の種目プレビュー -->
+    <div class="runner-next-panel">
+      <div class="runner-next-info">
+        <h5>Next Step</h5>
+        <span class="runner-next-name" id="runner-next-name">次の種目の名前</span>
+      </div>
+      <svg style="width:20px;height:20px;stroke:var(--text-secondary);stroke-width:2;fill:none" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+    </div>
+
+    <!-- コントロールボタン -->
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <div style="display:flex; gap:12px;">
+        <button class="btn btn-secondary" id="runner-pause-btn" style="flex:1;">一時停止</button>
+        <button class="btn btn-primary" id="runner-skip-btn" style="flex:1.5; --workout-color: var(--workout-color)">次へ進む</button>
+      </div>
+      <button class="btn btn-danger" id="runner-quit-btn" style="background:none; border:1px solid rgba(239,68,68,0.4); color:#f87171; padding:10px;">一時中断する</button>
+    </div>
+  </div>
+
+  <!-- フローティングトーストメッセージ -->
+  <div id="toast" class="toast">記録を保存しました</div>
+
+  <!-- 下部固定タブバーナビゲーション -->
+  <nav>
+    <button class="tab-btn active" data-tab="today">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+        <line x1="16" y1="2" x2="16" y2="6"/>
+        <line x1="8" y1="2" x2="8" y2="6"/>
+        <line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+      <span>今日</span>
+    </button>
+    
+    <button class="tab-btn" data-tab="menus">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <line x1="8" y1="6" x2="21" y2="6"/>
+        <line x1="8" y1="12" x2="21" y2="12"/>
+        <line x1="8" y1="18" x2="21" y2="18"/>
+        <line x1="3" y1="6" x2="3.01" y2="6"/>
+        <line x1="3" y1="12" x2="3.01" y2="12"/>
+        <line x1="3" y1="18" x2="3.01" y2="18"/>
+      </svg>
+      <span>メニュー</span>
+    </button>
+    
+    <button class="tab-btn" data-tab="history">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+      </svg>
+      <span>履歴</span>
+    </button>
+    
+    <button class="tab-btn" data-tab="settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+      <span>設定</span>
+    </button>
+  </nav>
+
+  <!-- Core Javascript File -->
+  <script src="app.js"></script>
+
+  <!-- ヘッダー内の今日の日付表示スクリプト -->
+  <script>
+    const days = ['日', '月', '火', '水', '木', '金', '土'];
+    const now = new Date();
+    document.getElementById('header-date-text').innerText = 
+      `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日 (${days[now.getDay()]})`;
+  </script>
+</body>
+</html>

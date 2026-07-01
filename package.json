@@ -1,0 +1,14 @@
+{
+  "name": "training-habit-tracker",
+  "version": "1.0.0",
+  "description": "週間トレーニングプログラムの継続を支援するトラッカーアプリ",
+  "main": "app.js",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.8",
+    "web-push": "^3.6.7"
+  },
+  "scripts": {
+    "send-push": "node scripts/send-push.js"
+  },
+  "private": true
+}
