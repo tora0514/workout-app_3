@@ -134,8 +134,8 @@ const EIGHT_WEEK_GUIDE = [
 
 const NOTIFICATION_CONFIG = {
   // ※ユーザーの環境に合わせて設定してください。
-  SUPABASE_URL: '', // 例: 'https://xxxxxx.supabase.co'
-  SUPABASE_ANON_KEY: '', // Supabase の anon キー
+  SUPABASE_URL: 'https://jeoodhtfzucpxplxlsfs.supabase.co/rest/v1/', // 例: 'https://xxxxxx.supabase.co'
+  SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Implb29kaHRmenVjcHhwbHhsc2ZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI4OTUxMTMsImV4cCI6MjA5ODQ3MTExM30.oh9ENAXSnMQK4DbGbwobYPE1l6Z7CZCT7hXqgK8FmfI', // Supabase の anon キー
   VAPID_PUBLIC_KEY: 'BFFN5L5I1HV-w0uCaz0ER27UkMkkG85neJvDAM3ITtgf0jnh3AoC3KZws2bf6M2Ht-Ov2lkUObNmEqX3FuwCqSc'
 };
 
