@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__claude-in-chrome__list_connected_browsers",
+      "mcp__claude-in-chrome__tabs_context_mcp",
+      "Bash(gh auth *)",
+      "Bash(gh --version)",
+      "Bash(curl -s \"https://api.github.com/repos/tora0514/workout-app_3/actions/runs/28744635115/jobs\")",
+      "Bash(curl -s \"https://api.github.com/repos/tora0514/workout-app_3/actions/runs/28744635115\")",
+      "Bash(curl -s \"https://api.github.com/repos/tora0514/workout-app_3/actions/workflows\")",
+      "Bash(curl -s \"https://api.github.com/repos/tora0514/workout-app_3/contents/\")"
+    ]
+  }
+}
